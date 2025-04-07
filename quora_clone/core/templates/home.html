@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <h2>All Questions</h2>
+    {% for q in questions %}
+        <p>{{ q.content }} - <a href="/question/{{ q.id }}/">View</a></p>
+    {% endfor %}
+    <p><a href="/post/">Post a Question</a> | <a href="/accounts/logout/">Logout</a></p>
+
+</body>
+</html>

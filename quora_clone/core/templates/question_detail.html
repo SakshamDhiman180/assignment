@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question details</title>
+</head>
+<body>
+    <h2>{{ question.content }}</h2>
+    <h3>Answers:</h3>
+    {% for a in answers %}
+        <p>{{ a.content }} - {{ a.user.username }} ({{ a.likes }} likes) <a href="/like/{{ a.id }}/">Like</a></p>
+    {% endfor %}
+    <h3>Post Your Answer</h3>
+    <form method="post">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit Answer</button>
+    </form>
+    <a href="/">Back to Home</a>
+
+</body>
+</html>
