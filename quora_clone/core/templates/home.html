@@ -1,16 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    .btn {
+      background-color: #007bff;
+      color: white;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    
+    .btn-danger {
+      background-color: #dc3545;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f2f4f8;
+      padding: 2rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h2 {
+      margin: 0;
+      color: #333;
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .actions a {
+      text-decoration: none;
+      background: #007bff;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+
+    .actions a:hover {
+      background: #0056b3;
+    }
+
+    .logout-form {
+      margin: 0;
+    }
+
+    .logout-form button {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+
+    .logout-form button:hover {
+      background: #c82333;
+    }
+
+    .question-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .question-card {
+      background: white;
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .question-card a {
+      text-decoration: none;
+      color: #007bff;
+      font-weight: 500;
+    }
+
+    .question-card a:hover {
+      text-decoration: underline;
+    }
+
+    .user-info {
+      font-size: 3.5 rem;
+      color: #555;
+    }
+
+    .toast {
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        animation: fadeOut 3s ease forwards;
+      }
+      .toast.error { background-color: #dc3545; }
+      .toast.warning { background-color: #ffc107; }
+      .toast.info { background-color: #17a2b8; }
+      
+      @keyframes fadeOut {
+        0% { opacity: 1; }
+        80% { opacity: 1; }
+        100% { opacity: 0; display: none; }
+      }
+  </style>
 </head>
 <body>
-    <h2>All Questions</h2>
-    {% for q in questions %}
-        <p>{{ q.content }} - <a href="/question/{{ q.id }}/">View</a></p>
+    <div id="toast-messages">
+        {% for message in messages %}
+          <div class="toast {{ message.tags }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+  <div class="header">
+    <h2>{% if user %} Your Questions {% else %} All Questions {% endif %}</h2>
+    <span class="user-info"><i>Logged in as: {{ current_user.username }}</i></span>
+    <div class="actions">
+        <a href="/">Home</a>  
+        <a href="/post/">Post a Question</a>
+        <a href="/?user=me">Your asked questions</a>
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+  </div>
+
+  <div class="question-list">
+    {% for item in data %}
+    <div class="question-card">
+        <div class="question-text">
+            <strong>{{ item.content }}</strong>
+        </div>
+        <div class="question-meta">
+            <span class="user-info">{{ item.user.username }} • {{ item.created_at|date:"M d, Y H:i" }}</span>
+            <div class="question-actions" style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                <a class="btn" style="padding: 4px 10px; color: white;" href="/question/{{ item.id }}/" class="view-link">View</a>
+                {% if user %}
+                <form action="{% url 'delete_question' item.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this question?');">
+                    {% csrf_token %}
+                    <button class="btn btn-danger" type="submit" style="padding: 4px 10px;">Delete</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p>No questions posted yet.</p>
     {% endfor %}
-    <p><a href="/post/">Post a Question</a> | <a href="/accounts/logout/">Logout</a></p>
+</div>
 
 </body>
 </html>
